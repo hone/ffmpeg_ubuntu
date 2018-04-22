@@ -33,6 +33,7 @@ typedef struct StackContext {
     const AVClass *class;
     const AVPixFmtDescriptor *desc;
     int nb_inputs;
+    int shortest;
     int is_vertical;
     int nb_planes;
 
@@ -43,23 +44,18 @@ typedef struct StackContext {
 static int query_formats(AVFilterContext *ctx)
 {
     AVFilterFormats *pix_fmts = NULL;
-    int fmt;
+    int fmt, ret;
 
     for (fmt = 0; av_pix_fmt_desc_get(fmt); fmt++) {
         const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(fmt);
         if (!(desc->flags & AV_PIX_FMT_FLAG_PAL ||
               desc->flags & AV_PIX_FMT_FLAG_HWACCEL ||
-              desc->flags & AV_PIX_FMT_FLAG_BITSTREAM))
-            ff_add_format(&pix_fmts, fmt);
+              desc->flags & AV_PIX_FMT_FLAG_BITSTREAM) &&
+            (ret = ff_add_format(&pix_fmts, fmt)) < 0)
+            return ret;
     }
 
     return ff_set_common_formats(ctx, pix_fmts);
-}
-
-static int filter_frame(AVFilterLink *inlink, AVFrame *in)
-{
-    StackContext *s = inlink->dst->priv;
-    return ff_framesync_filter_frame(&s->fs, inlink, in);
 }
 
 static av_cold int init(AVFilterContext *ctx)
@@ -81,7 +77,6 @@ static av_cold int init(AVFilterContext *ctx)
         pad.name = av_asprintf("input%d", i);
         if (!pad.name)
             return AVERROR(ENOMEM);
-        pad.filter_frame = filter_frame;
 
         if ((ret = ff_insert_inpad(ctx, i, &pad)) < 0) {
             av_freep(&pad.name);
@@ -110,6 +105,7 @@ static int process_frame(FFFrameSync *fs)
     if (!out)
         return AVERROR(ENOMEM);
     out->pts = av_rescale_q(s->fs.pts, s->fs.time_base, outlink->time_base);
+    out->sample_aspect_ratio = outlink->sample_aspect_ratio;
 
     for (i = 0; i < s->nb_inputs; i++) {
         AVFilterLink *inlink = ctx->inputs[i];
@@ -121,7 +117,7 @@ static int process_frame(FFFrameSync *fs)
             return ret;
         }
 
-        height[1] = height[2] = FF_CEIL_RSHIFT(inlink->h, s->desc->log2_chroma_h);
+        height[1] = height[2] = AV_CEIL_RSHIFT(inlink->h, s->desc->log2_chroma_h);
         height[0] = height[3] = inlink->h;
 
         for (p = 0; p < s->nb_planes; p++) {
@@ -152,6 +148,7 @@ static int config_output(AVFilterLink *outlink)
     StackContext *s = ctx->priv;
     AVRational time_base = ctx->inputs[0]->time_base;
     AVRational frame_rate = ctx->inputs[0]->frame_rate;
+    AVRational sar = ctx->inputs[0]->sample_aspect_ratio;
     int height = ctx->inputs[0]->h;
     int width = ctx->inputs[0]->w;
     FFFrameSyncIn *in;
@@ -184,6 +181,7 @@ static int config_output(AVFilterLink *outlink)
     outlink->h          = height;
     outlink->time_base  = time_base;
     outlink->frame_rate = frame_rate;
+    outlink->sample_aspect_ratio = sar;
 
     if ((ret = ff_framesync_init(&s->fs, ctx, s->nb_inputs)) < 0)
         return ret;
@@ -198,29 +196,35 @@ static int config_output(AVFilterLink *outlink)
         in[i].time_base = inlink->time_base;
         in[i].sync   = 1;
         in[i].before = EXT_STOP;
-        in[i].after  = EXT_INFINITY;
+        in[i].after  = s->shortest ? EXT_STOP : EXT_INFINITY;
     }
 
     return ff_framesync_configure(&s->fs);
 }
 
-static int request_frame(AVFilterLink *outlink)
-{
-    StackContext *s = outlink->src->priv;
-    return ff_framesync_request_frame(&s->fs, outlink);
-}
-
 static av_cold void uninit(AVFilterContext *ctx)
 {
     StackContext *s = ctx->priv;
+    int i;
+
     ff_framesync_uninit(&s->fs);
     av_freep(&s->frames);
+
+    for (i = 0; i < ctx->nb_inputs; i++)
+        av_freep(&ctx->input_pads[i].name);
+}
+
+static int activate(AVFilterContext *ctx)
+{
+    StackContext *s = ctx->priv;
+    return ff_framesync_activate(&s->fs);
 }
 
 #define OFFSET(x) offsetof(StackContext, x)
 #define FLAGS AV_OPT_FLAG_VIDEO_PARAM | AV_OPT_FLAG_FILTERING_PARAM
 static const AVOption stack_options[] = {
     { "inputs", "set number of inputs", OFFSET(nb_inputs), AV_OPT_TYPE_INT, {.i64=2}, 2, INT_MAX, .flags = FLAGS },
+    { "shortest", "force termination when the shortest input terminates", OFFSET(shortest), AV_OPT_TYPE_BOOL, {.i64=0}, 0, 1, .flags = FLAGS },
     { NULL },
 };
 
@@ -229,7 +233,6 @@ static const AVFilterPad outputs[] = {
         .name          = "default",
         .type          = AVMEDIA_TYPE_VIDEO,
         .config_props  = config_output,
-        .request_frame = request_frame,
     },
     { NULL }
 };
@@ -248,6 +251,7 @@ AVFilter ff_vf_hstack = {
     .outputs       = outputs,
     .init          = init,
     .uninit        = uninit,
+    .activate      = activate,
     .flags         = AVFILTER_FLAG_DYNAMIC_INPUTS,
 };
 
@@ -267,6 +271,7 @@ AVFilter ff_vf_vstack = {
     .outputs       = outputs,
     .init          = init,
     .uninit        = uninit,
+    .activate      = activate,
     .flags         = AVFILTER_FLAG_DYNAMIC_INPUTS,
 };
 

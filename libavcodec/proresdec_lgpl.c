@@ -177,6 +177,7 @@ static int decode_frame_header(ProresContext *ctx, const uint8_t *buf,
     avctx->color_primaries = buf[14];
     avctx->color_trc       = buf[15];
     avctx->colorspace      = buf[16];
+    avctx->color_range     = AVCOL_RANGE_MPEG;
 
     ctx->qmat_changed = 0;
     ptr   = buf + 20;
@@ -251,7 +252,7 @@ static int decode_picture_header(ProresContext *ctx, const uint8_t *buf,
                       (1 << (4 + ctx->frame->interlaced_frame)) - 1) >>
                      (4 + ctx->frame->interlaced_frame);
 
-    remainder    = ctx->num_x_mbs & ((1 << slice_width_factor) - 1);
+    remainder    = av_mod_uintp2(ctx->num_x_mbs, slice_width_factor);
     num_x_slices = (ctx->num_x_mbs >> slice_width_factor) + (remainder & 1) +
                    ((remainder >> 1) & 1) + ((remainder >> 2) & 1);
 

@@ -25,6 +25,7 @@
 #define AVFORMAT_MOVENC_H
 
 #include "avformat.h"
+#include "movenccenc.h"
 
 #define MOV_FRAG_INFO_ALLOC_INCREMENT 64
 #define MOV_INDEX_CLUSTER_SIZE 1024
@@ -52,6 +53,7 @@ typedef struct MOVIentry {
     int          cts;
 #define MOV_SYNC_SAMPLE         0x0001
 #define MOV_PARTIAL_SYNC_SAMPLE 0x0002
+#define MOV_DISPOSABLE_SAMPLE   0x0004
     uint32_t     flags;
 } MOVIentry;
 
@@ -88,6 +90,7 @@ typedef struct MOVTrack {
     long        sample_size;
     long        chunkCount;
     int         has_keyframes;
+    int         has_disposable;
 #define MOV_TRACK_CTTS         0x0001
 #define MOV_TRACK_STPS         0x0002
 #define MOV_TRACK_ENABLED      0x0004
@@ -100,7 +103,7 @@ typedef struct MOVTrack {
     int         track_id;
     int         tag; ///< stsd fourcc
     AVStream        *st;
-    AVCodecContext *enc;
+    AVCodecParameters *par;
     int multichannel_as_mono;
 
     int         vos_len;
@@ -114,6 +117,8 @@ typedef struct MOVTrack {
     int64_t     start_dts;
     int64_t     start_cts;
     int64_t     end_pts;
+    int         end_reliable;
+    int64_t     dts_shift;
 
     int         hint_track;   ///< the track that hints this track, -1 if no hint track is set
     int         src_track;    ///< the track that this hint (or tmcd) track describes
@@ -127,6 +132,7 @@ typedef struct MOVTrack {
     uint32_t    default_size;
 
     HintSampleQueue sample_queue;
+    AVPacket cover_image;
 
     AVIOContext *mdat_buf;
     int64_t     data_offset;
@@ -149,7 +155,19 @@ typedef struct MOVTrack {
     } vc1_info;
 
     void       *eac3_priv;
+
+    MOVMuxCencContext cenc;
+
+    uint32_t palette[AVPALETTE_COUNT];
+    int pal_done;
+
+    int is_unaligned_qt_rgb;
 } MOVTrack;
+
+typedef enum {
+    MOV_ENC_NONE = 0,
+    MOV_ENC_CENC_AES_CTR,
+} MOVEncryptionScheme;
 
 typedef struct MOVMuxContext {
     const AVClass *av_class;
@@ -193,6 +211,19 @@ typedef struct MOVMuxContext {
 
     int frag_interleave;
     int missing_duration_warned;
+
+    char *encryption_scheme_str;
+    MOVEncryptionScheme encryption_scheme;
+    uint8_t *encryption_key;
+    int encryption_key_len;
+    uint8_t *encryption_kid;
+    int encryption_kid_len;
+
+    int need_rewrite_extradata;
+
+    int use_stream_ids_as_track_ids;
+    int track_ids_ok;
+    int write_tmcd;
 } MOVMuxContext;
 
 #define FF_MOV_FLAG_RTP_HINT              (1 <<  0)
@@ -212,6 +243,10 @@ typedef struct MOVMuxContext {
 #define FF_MOV_FLAG_GLOBAL_SIDX           (1 << 14)
 #define FF_MOV_FLAG_WRITE_COLR            (1 << 15)
 #define FF_MOV_FLAG_WRITE_GAMA            (1 << 16)
+#define FF_MOV_FLAG_USE_MDTA              (1 << 17)
+#define FF_MOV_FLAG_SKIP_TRAILER          (1 << 18)
+#define FF_MOV_FLAG_NEGATIVE_CTS_OFFSETS  (1 << 19)
+#define FF_MOV_FLAG_FRAG_EVERY_FRAME      (1 << 20)
 
 int ff_mov_write_packet(AVFormatContext *s, AVPacket *pkt);
 

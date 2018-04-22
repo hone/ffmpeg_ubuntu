@@ -53,10 +53,6 @@ static av_cold int decode_init(AVCodecContext *avctx)
 {
     V210DecContext *s = avctx->priv_data;
 
-    if (avctx->width & 1) {
-        av_log(avctx, AV_LOG_ERROR, "v210 needs even width\n");
-        return AVERROR_INVALIDDATA;
-    }
     avctx->pix_fmt             = AV_PIX_FMT_YUV422P10;
     avctx->bits_per_raw_sample = 10;
 
@@ -141,7 +137,7 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
         }
 
         psrc += stride;
-        y += pic->linesize[0] / 2 - avctx->width;
+        y += pic->linesize[0] / 2 - avctx->width + (avctx->width & 1);
         u += pic->linesize[1] / 2 - avctx->width / 2;
         v += pic->linesize[2] / 2 - avctx->width / 2;
     }
@@ -166,10 +162,10 @@ static const AVOption v210dec_options[] = {
 };
 
 static const AVClass v210dec_class = {
-    "V210 Decoder",
-    av_default_item_name,
-    v210dec_options,
-    LIBAVUTIL_VERSION_INT,
+    .class_name = "V210 Decoder",
+    .item_name  = av_default_item_name,
+    .option     = v210dec_options,
+    .version    = LIBAVUTIL_VERSION_INT,
 };
 
 AVCodec ff_v210_decoder = {

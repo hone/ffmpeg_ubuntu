@@ -59,8 +59,8 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *in)
     AVFilterLink *outlink    = inlink->dst->outputs[0];
     AVFrame *out;
     int i, c, w = inlink->w, h = inlink->h;
-    const int cw = FF_CEIL_RSHIFT(w, priv->pix_desc->log2_chroma_w);
-    const int ch = FF_CEIL_RSHIFT(h, priv->pix_desc->log2_chroma_h);
+    const int cw = AV_CEIL_RSHIFT(w, priv->pix_desc->log2_chroma_w);
+    const int ch = AV_CEIL_RSHIFT(h, priv->pix_desc->log2_chroma_h);
 
     out = ff_get_video_buffer(outlink, outlink->w, outlink->h);
     if (!out) {
@@ -81,7 +81,7 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *in)
 
     /* copy palette */
     if (priv->pix_desc->flags & AV_PIX_FMT_FLAG_PAL ||
-        priv->pix_desc->flags & AV_PIX_FMT_FLAG_PSEUDOPAL)
+        ((priv->pix_desc->flags & FF_PSEUDOPAL) && out->data[1] && in->data[1]))
         memcpy(out->data[1], in->data[1], AVPALETTE_SIZE);
 
     for (c = 0; c < priv->pix_desc->nb_components; c++) {
