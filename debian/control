@@ -185,10 +185,10 @@ Architecture: any
 Multi-Arch: same
 Depends:
  ffmpeg (= ${binary:Version}),
- libavcodec-ffmpeg56 (= ${binary:Version}) | libavcodec-ffmpeg-extra56 (= ${binary:Version}),
- libavdevice-ffmpeg56 (= ${binary:Version}),
+ libavcodec-ffmpeg58 (= ${binary:Version}) | libavcodec-ffmpeg-extra58 (= ${binary:Version}),
+ libavdevice-ffmpeg58 (= ${binary:Version}),
  libavfilter-ffmpeg5 (= ${binary:Version}),
- libavformat-ffmpeg56 (= ${binary:Version}),
+ libavformat-ffmpeg58 (= ${binary:Version}),
  libavutil-ffmpeg54 (= ${binary:Version}),
  libpostproc-ffmpeg53 (= ${binary:Version}),
  libavresample-ffmpeg2 (= ${binary:Version}),
@@ -222,7 +222,7 @@ Description: Documentation of the FFmpeg multimedia framework
  framework including the API documentation created by doxygen and the manpages
  for the libraries.
 
-Package: libavcodec-ffmpeg56
+Package: libavcodec-ffmpeg58
 Architecture: any
 Section: libs
 Multi-Arch: same
@@ -248,12 +248,12 @@ Description: FFmpeg library with de/encoders for audio/video codecs - runtime fi
  .
  This package contains the runtime files.
 
-Package: libavcodec-ffmpeg-extra56
+Package: libavcodec-ffmpeg-extra58
 Architecture: any
 Section: libs
 Priority: extra
 Multi-Arch: same
-Conflicts: libavcodec-ffmpeg56
+Conflicts: libavcodec-ffmpeg58
 Provides: libavcodec-extra
 Pre-Depends:
  ${misc:Pre-Depends}
@@ -275,7 +275,7 @@ Description: FFmpeg library with additional de/encoders for audio/video codecs
  to DSP optimizations, and makes it suitable for implementing robust and fast
  codecs as well as for experimentation.
  .
- This package replaces the libavcodec-ffmpeg56 package and contains the
+ This package replaces the libavcodec-ffmpeg58 package and contains the
  following additional codecs:
  .
   * OpenCORE Adaptive Multi-Rate (AMR) Narrow-Band (Encoder/Decoder)
@@ -293,7 +293,7 @@ Section: metapackages
 Priority: extra
 Multi-Arch: foreign
 Depends:
- libavcodec-ffmpeg-extra56,
+ libavcodec-ffmpeg-extra58,
  ${misc:Depends}
 Description: FFmpeg library with extra codecs (metapackage)
  FFmpeg is the leading multimedia framework, able to decode, encode, transcode,
@@ -313,7 +313,7 @@ Multi-Arch: same
 Conflicts:
  libavcodec-libav-dev
 Depends:
- libavcodec-ffmpeg56 (= ${binary:Version}) | libavcodec-ffmpeg-extra56 (= ${binary:Version}),
+ libavcodec-ffmpeg58 (= ${binary:Version}) | libavcodec-ffmpeg-extra58 (= ${binary:Version}),
  libavutil-dev (= ${binary:Version}),
  libswresample-dev (= ${binary:Version}),
  ${misc:Depends}
@@ -333,7 +333,7 @@ Description: FFmpeg library with de/encoders for audio/video codecs - developmen
  .
  This package contains the development files.
 
-Package: libavdevice-ffmpeg56
+Package: libavdevice-ffmpeg58
 Architecture: any
 Section: libs
 Multi-Arch: same
@@ -363,7 +363,7 @@ Conflicts:
  libavdevice-libav-dev
 Depends:
  libavcodec-dev (= ${binary:Version}),
- libavdevice-ffmpeg56 (= ${binary:Version}),
+ libavdevice-ffmpeg58 (= ${binary:Version}),
  libavfilter-dev (= ${binary:Version}),
  libavformat-dev (= ${binary:Version}),
  libavresample-dev (= ${binary:Version}),
@@ -432,7 +432,7 @@ Description: FFmpeg library containing media filters - development files
  .
  This package contains the development files.
 
-Package: libavformat-ffmpeg56
+Package: libavformat-ffmpeg58
 Architecture: any
 Section: libs
 Multi-Arch: same
@@ -463,7 +463,7 @@ Conflicts:
  libavformat-libav-dev
 Depends:
  libavcodec-dev (= ${binary:Version}),
- libavformat-ffmpeg56 (= ${binary:Version}),
+ libavformat-ffmpeg58 (= ${binary:Version}),
  libavutil-dev (= ${binary:Version}),
  libswresample-dev (= ${binary:Version}),
  ${misc:Depends}
