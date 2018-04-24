@@ -1,3 +1,13 @@
+ffmpeg (7:4.0-0ubuntu0.16.04.1) UNRELEASED; urgency=medium
+
+  * New upstream version 4.0
+  * move from symbol 56 to 58
+  * patches don't apply to FFmpeg 4.0
+  * remove options not used / outdated for FFmpeg 4.0
+  * update symbols
+
+ -- Terence Lee <hone02@gmail.com>  Mon, 23 Apr 2018 22:16:07 -0500
+
 ffmpeg (7:2.8.14-0ubuntu0.16.04.1) xenial-security; urgency=medium
 
   * New upstream bugfix release. (LP: #1697785)
