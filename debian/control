@@ -79,8 +79,6 @@ Build-Depends:
  libopencore-amrwb-dev,
 # --enable-libopencv
  libopencv-dev [!sh4 !sparc64] <!stage1>,
-# --enable-libopenjpeg
- libopenjpeg-dev,
 # --enable-libopus
  libopus-dev,
 # Disabled, as it might produce problems.
@@ -90,8 +88,6 @@ Build-Depends:
  libpulse-dev,
 # --enable-librtmp
  librtmp-dev,
-# --enable-libschroedinger
- libschroedinger-dev,
 # autodetected: protocol 'sctp'
  libsctp-dev [linux-any],
 # autodetected: SDL support
@@ -117,8 +113,6 @@ Build-Depends:
  libva-dev [!hurd-any],
 # autodetected: hwaccels 'h263_vdpau, mpeg2_vdpau, vc1_vdpau, h264_vdpau, mpeg4_vdpau, wmv3_vdpau, mpeg1_vdpau', decoders 'h264_vdpau, mpeg1_vdpau, mpeg4_vdpau, mpeg_vdpau, vc1_vdpau, wmv3_vdpau'
  libvdpau-dev,
-# --enable-libvo_aacenc
- libvo-aacenc-dev,
 # --enable-libvo_amrwbenc
  libvo-amrwbenc-dev,
 # --enable-libvorbis
@@ -133,8 +127,6 @@ Build-Depends:
  libx264-dev [!sparc64] <!stage1>,
 # --enable-libx265
  libx265-dev,
-# --enable-x11grab
- libxext-dev,
 # --enable-libxvid
  libxvidcore-dev,
 # autodetected: decoder 'mpeg_xvmc'; outdev 'xv'

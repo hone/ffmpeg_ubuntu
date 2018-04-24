@@ -65,8 +65,6 @@ CONFIG := --prefix=/usr \
 	--enable-gpl \
 	--enable-shared \
 	--disable-stripping \
-	--disable-decoder=libopenjpeg \
-	--disable-decoder=libschroedinger \
 	--enable-avresample \
 	--enable-avisynth \
 	--enable-gnutls \
@@ -84,11 +82,9 @@ CONFIG := --prefix=/usr \
 	--enable-libgsm \
 	--enable-libmodplug \
 	--enable-libmp3lame \
-	--enable-libopenjpeg \
 	--enable-libopus \
 	--enable-libpulse \
 	--enable-librtmp \
-	--enable-libschroedinger \
 	--enable-libshine \
 	--enable-libsnappy \
 	--enable-libsoxr \
@@ -104,8 +100,7 @@ CONFIG := --prefix=/usr \
 	--enable-libxvid \
 	--enable-libzvbi \
 	--enable-openal \
-	--enable-opengl \
-	--enable-x11grab
+	--enable-opengl
 
 # The standard configuration only uses the shared CONFIG.
 CONFIG_standard =
@@ -122,7 +117,6 @@ CONFIG_extra = --enable-version3 \
 	--disable-swscale \
 	--enable-libopencore_amrnb \
 	--enable-libopencore_amrwb \
-	--enable-libvo_aacenc \
 	--enable-libvo_amrwbenc
 
 # Disable optimizations if requested.
