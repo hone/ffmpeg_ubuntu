@@ -1,0 +1,12 @@
+libpostproc-ffmpeg.so.55 libpostproc-ffmpeg55 #MINVER#
+ LIBPOSTPROC_55@LIBPOSTPROC_55 7:4.0-0ubuntu0.16.04.1
+ postproc_configuration@LIBPOSTPROC_55 7:4.0-0ubuntu0.16.04.1
+ postproc_ffversion@LIBPOSTPROC_55 7:4.0-0ubuntu0.16.04.1
+ postproc_license@LIBPOSTPROC_55 7:4.0-0ubuntu0.16.04.1
+ postproc_version@LIBPOSTPROC_55 7:4.0-0ubuntu0.16.04.1
+ pp_free_context@LIBPOSTPROC_55 7:4.0-0ubuntu0.16.04.1
+ pp_free_mode@LIBPOSTPROC_55 7:4.0-0ubuntu0.16.04.1
+ pp_get_context@LIBPOSTPROC_55 7:4.0-0ubuntu0.16.04.1
+ pp_get_mode_by_name_and_quality@LIBPOSTPROC_55 7:4.0-0ubuntu0.16.04.1
+ pp_help@LIBPOSTPROC_55 7:4.0-0ubuntu0.16.04.1
+ pp_postprocess@LIBPOSTPROC_55 7:4.0-0ubuntu0.16.04.1
